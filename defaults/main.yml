@@ -1,0 +1,7 @@
+openldap_packages:
+  - openldap
+  - openldap-devel
+  - compat-openldap
+  - openldap-clients
+  - openldap-servers 
+  - openldap-servers-sql

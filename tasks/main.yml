@@ -1,0 +1,21 @@
+---
+
+- name: Install epel repository
+  yum:
+    name: epel-release
+    state: present
+    update_cache: yes
+    
+- name: Install openldap required packages
+  yum:
+    name: "{{ openldap_packages }}"
+    state: present
+    update_cache: yes
+  with_items: "{{ openldap_packages }}"
+    
+- name: Start and enable openldap service
+  systemd:
+    name: slapd
+    state: started
+    enabled: yes
+
