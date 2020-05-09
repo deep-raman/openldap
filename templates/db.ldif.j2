@@ -1,12 +1,12 @@
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcSuffix
-olcSuffix: dc={{ domain }},dc={{ domain_sufix }}
+olcSuffix: dc={{ domain }},dc={{ domain_suffix }}
 
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcRootDN
-olcRootDN: cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_sufix }}
+olcRootDN: cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}
 
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
