@@ -5,3 +5,9 @@ openldap_packages:
   - openldap-clients
   - openldap-servers 
   - openldap-servers-sql
+
+olc_rootDN: ldapadm
+domain: mydomain
+domain_suffix: local
+slapd_path: /etc/openldap/slapd.d
+
