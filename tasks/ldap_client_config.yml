@@ -1,0 +1,28 @@
+---
+
+- name: Install epel repository
+  yum:
+    name: epel-release
+    state: present
+    update_cache: yes
+
+- name: Install ldap clients required packages
+  yum:
+    name: "{{ openldap_client_pckgs }}"
+    state: present
+    update_cache: yes
+  with_items: "{{ openldap_client_pckgs }}"
+
+- name: Check selinux status
+  command: getenforce
+  register: selinux_status
+
+- name: Enable ldap external authentication
+  command: "authconfig --enableldap --enableldapauth --ldapserver={{ ldap_server }} --ldapbasedn=\"dc={{ domain }},dc={{ domain_suffix }}\" --enablemkhomedir --update"
+
+- name: Check if system is connected to ldap server
+  command: getent passwd batraman
+  register: ldap_status
+
+- debug:
+    msg: "Ldap status output :  {{ ldap_status.stdout }}"

@@ -96,4 +96,8 @@
     responses:
       Enter LDAP Password: "{{ ldap_rootpass }}"
 
+- import_tasks: ldap_client_config.yml
+  tags:
+    - ldap_client
+
   
