@@ -5,14 +5,14 @@
     name: epel-release
     state: present
     update_cache: yes
-    
+
 - name: Install openldap required packages
   yum:
     name: "{{ openldap_packages }}"
     state: present
     update_cache: yes
   with_items: "{{ openldap_packages }}"
-    
+
 - name: Start and enable openldap service
   systemd:
     name: slapd
@@ -51,10 +51,49 @@
 - debug:
     msg: "This is the encrypted password {{ ldap_encrypted_pass }}"
 
-- Name: Upload db.ldif file
+- name: Upload db.ldif file
   template:
     src: db.ldif.j2
     dest: "{{ slapd_path }}/db.ldif"
     backup: yes
-- Name: Upload monitor.ldif file
+
+- name: Upload monitor.ldif file
+  template:
+    src: monitor.ldif.j2
+    dest: "{{ slapd_path }}/monitor.ldif"
+    backup: yes
+
+- name: Apply configuration changes
+  command: " {{ item }}"
+  loop:
+    - "ldapmodify -Y EXTERNAL  -H ldapi:/// -f {{ slapd_path }}/db.ldif"
+    - "ldapmodify -Y EXTERNAL  -H ldapi:/// -f {{ slapd_path }}/monitor.ldif"
+
+- name: Copy DB_CONFIG
+  copy:
+    src: /usr/share/openldap-servers/DB_CONFIG.example
+    dest: /var/lib/ldap/DB_CONFIG
+    remote_src: yes
+    owner: ldap
+    group: ldap
+
+- name: Add cosine and nis ldap schemas
+  command: "{{ item }}"
+  loop:
+    - ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+    - ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
+    - ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+
+- name: Upload base.ldif template
+  template:
+    src: base.ldif.j2
+    dest: "{{ slapd_path }}/base.ldif"
+    backup: yes
+
+- name: Apply the base.ldif configuration
+  expect:
+    command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/base.ldif"
+    responses:
+      Enter LDAP Password: "{{ ldap_rootpass }}"
+
   
