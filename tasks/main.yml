@@ -19,3 +19,42 @@
     state: started
     enabled: yes
 
+- name: Enter ldap root password
+  pause:
+    prompt: "Please enter ldap root password"
+    echo: no
+  register: password_prompt
+
+#- debug:
+#    msg: "this is the entered password : {{ password_prompt.user_input }}"
+
+- set_fact:
+    ldap_rootpass: "{{ password_prompt.user_input }}"
+
+- name: "Ansible | Print a message if a variable is undefined"
+  debug:
+    msg: "The 'ldap_rootpass' variable is undefined"
+  when: ldap_rootpass is not defined
+
+- name: Encrypt password
+  command: "slappasswd -h {SSHA} -s {{ ldap_rootpass }}"
+  register: encryption
+
+- set_fact:
+    ldap_encrypted_pass: "{{ encryption.stdout }}"
+
+- name: ERROR | Encrypted ldap password not set
+  debug:
+    msg: "The 'ldap_encrypted_pass' variable is undefined"
+  when: ldap_encrypted_pass is not defined
+
+- debug:
+    msg: "This is the encrypted password {{ ldap_encrypted_pass }}"
+
+- Name: Upload db.ldif file
+  template:
+    src: db.ldif.j2
+    dest: "{{ slapd_path }}/db.ldif"
+    backup: yes
+- Name: Upload monitor.ldif file
+  
