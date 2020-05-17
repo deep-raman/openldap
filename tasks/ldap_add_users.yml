@@ -1,0 +1,29 @@
+- name: Enter ldap root password
+  pause:
+    prompt: "Please enter ldap root password"
+    echo: no
+  register: password_prompt
+
+#- debug:
+#    msg: "this is the entered password : {{ password_prompt.user_input }}"
+
+- set_fact:
+    ldap_rootpass: "{{ password_prompt.user_input }}"
+
+- name: create users configuration
+  template:
+    src: bulk_users.j2
+    dest: "{{ slapd_path }}/bulk_users.ldif"
+
+#- name: Apply bulk users to ldap
+#  expect:
+#    command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/bulk_users.ldif"
+#    responses:
+#      Enter LDAP Password: "{{ ldap_rootpass }}"
+
+- name: Set users initial password
+  expect:
+    command: "ldappasswd -s {{ item.user_name }}1234 -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -x \"uid={{ item.user_name }},ou=People,dc={{ domain }},dc={{ domain_suffix }}\""
+    responses:
+      Enter LDAP Password: "{{ ldap_rootpass }}"
+  with_items: "{{ ldap_users }}"
