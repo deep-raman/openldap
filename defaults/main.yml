@@ -19,3 +19,14 @@ openldap_client_pckgs:
   - nss-pam-ldapd
 
 ldap_server: 10.114.0.2
+
+ldap_users:
+  - user_name: batman
+    group_name: batman
+    uid: 1005
+  - user_name: robin
+    group_name: robin
+    uid: 1006
+  - user_name: joker
+    group_name: joker
+    uid: 1007
