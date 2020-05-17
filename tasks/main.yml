@@ -127,3 +127,7 @@
 - import_tasks: ldap_add_users.yml
   tags:
     - add_users
+
+- import_tasks: ldap_deactivate_user.yml
+  tags:
+    - deactivate_user
