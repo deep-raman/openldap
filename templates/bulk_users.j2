@@ -1,0 +1,27 @@
+{% for item in ldap_users %}
+# create group {{ item.group_name }}
+dn: cn={{ item.group_name }},ou=Group,dc={{ domain }},dc={{ domain_suffix }}
+objectClass: top
+objectClass: posixGroup
+gidNumber: {{ item.uid }}
+
+# create user {{ item.user_name }}
+dn: uid={{ item.user_name }},ou=People,dc={{ domain }},dc={{ domain_suffix }}
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: {{ item.user_name }}
+uid: {{ item.user_name }}
+uidNumber: {{ item.uid }}
+gidNumber: {{ item.uid }}
+homeDirectory: /home/{{ item.user_name }}
+userPassword: {crypt}x
+loginShell: /bin/bash
+gecos: {{ item.user_name }}
+shadowLastChange: 15140
+shadowMin: 0
+shadowMax: 99999
+shadowWarning: 7
+
+{% endfor %}
