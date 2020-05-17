@@ -63,11 +63,25 @@
     dest: "{{ slapd_path }}/monitor.ldif"
     backup: yes
 
+- name: Upload slapd_log.ldif file
+  file:
+    src: slapd_log.ldif
+    dest: "{{ slapd_path }}/slapd_log.ldif"
+    backup: yes
+
+- name: Upload ldap_pass.ldif file
+  template:
+    src: ldap_pass.ldif.j2
+    dest: "{{ slapd_path }}/ldap_pass.ldif"
+    backup: yes
+
 - name: Apply configuration changes
   command: " {{ item }}"
   loop:
-    - "ldapmodify -Y EXTERNAL  -H ldapi:/// -f {{ slapd_path }}/db.ldif"
-    - "ldapmodify -Y EXTERNAL  -H ldapi:/// -f {{ slapd_path }}/monitor.ldif"
+    - "ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ slapd_path }}/db.ldif"
+    - "ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ slapd_path }}/monitor.ldif"
+    - "ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ slapd_path }}/slapd_log.ldif"
+    - "ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ slapd_path }}/ldap_pass.ldif"
 
 - name: Copy DB_CONFIG
   copy:
@@ -95,6 +109,16 @@
     command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/base.ldif"
     responses:
       Enter LDAP Password: "{{ ldap_rootpass }}"
+
+- name: Upload ladp server rsyslog template
+  template:
+    src: 10-slapd.conf.j2
+    dest: /etc/rsyslod.d/10-slapd.conf
+
+- name: Restart rsyslog service
+  systemd:
+    name: rsyslog
+    state: restarted
 
 - import_tasks: ldap_client_config.yml
   tags:

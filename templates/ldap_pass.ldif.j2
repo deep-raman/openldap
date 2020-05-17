@@ -1,0 +1,5 @@
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: to attrs=userPassword by self write by anonymous auth by dn.base="cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}" write by * none
+olcAccess: to * by self write by dn.base="cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}" write by * read
