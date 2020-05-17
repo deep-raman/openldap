@@ -124,4 +124,6 @@
   tags:
     - ldap_client
 
-  
+- import_tasks: ldap_add_users.yml
+  tags:
+    - add_users
