@@ -15,11 +15,11 @@
     src: bulk_users.j2
     dest: "{{ slapd_path }}/bulk_users.ldif"
 
-#- name: Apply bulk users to ldap
-#  expect:
-#    command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/bulk_users.ldif"
-#    responses:
-#      Enter LDAP Password: "{{ ldap_rootpass }}"
+- name: Apply bulk users to ldap
+  expect:
+    command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/bulk_users.ldif"
+    responses:
+      Enter LDAP Password: "{{ ldap_rootpass }}"
 
 - name: Set users initial password
   expect:
