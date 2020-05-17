@@ -1,0 +1,8 @@
+{% for item in deactivate_user %}
+# deactivate user {{ item }}
+dn: uid={{ item }},ou=People,dc={{ domain }},dc={{ domain_suffix }}
+changetype: modify
+add: shadowExpire
+shadowExpire: {{ expire_date }}
+
+{% endfor %}
