@@ -1,0 +1,52 @@
+- name: Enter ldap root password
+  pause:
+    prompt: "Please enter ldap root password"
+    echo: no
+  register: password_prompt
+
+#- debug:
+#    msg: "this is the entered password : {{ password_prompt.user_input }}"
+
+- set_fact:
+    ldap_rootpass: "{{ password_prompt.user_input }}"
+
+- name: Enter account name
+  pause:
+    prompt: "Please enter ldap account to deactivate"
+  register: user_prompt
+
+- set_fact:
+    deactivate_user: "{{ user_prompt.user_input }}"
+  
+#- debug:
+#    msg: "This is the user to deactivate : {{ deactivate_user }}"
+
+- name: Enter user leaving date
+  pause:
+    prompt: "Please enter the user leaving date, e.g. 20 May 2020"
+  register: date_prompt
+
+- set_fact:
+    leaving_date: "{{ date_prompt.user_input }}"
+
+- name: Convert date to days
+  shell: "x=`date -d\"{{ leaving_date }}\" +\"%s\"` ; echo $(( $x / 3600 / 24 ))"
+  register: date_to_days
+  delegate_to: localhost
+
+- set_fact:
+    expire_date: "{{ date_to_days.stdout }}"
+
+#- debug:
+#    msg: "This is the date in days : {{ expire_date }}"
+
+- name: Upload users to delete
+  template:
+    src: deactivate_user.ldif.j2
+    dest: "{{ slapd_path }}/deactivate_user.ldif"
+
+- name: Apply deactivate_user.ldif
+  expect:
+    command: "ldapadd -x -W -D \"cn={{ olc_rootDN }},dc={{ domain }},dc={{ domain_suffix }}\" -f {{ slapd_path }}/deactivate_user.ldif"
+    responses:
+      Enter LDAP Password: "{{ ldap_rootpass }}"
