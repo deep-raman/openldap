@@ -11,7 +11,7 @@ Role variables
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-	**openldap_packages** : the required packages to setup openldap server.
+	openldap_packages : the required packages to setup openldap server.
 	olc_rootDN: ldap admin user account.
 	domain: domain name for this openldap server is being setup.
 	domain_suffix: domain's suffix (com, net, org, etc...)
